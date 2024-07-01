@@ -7,6 +7,9 @@ import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffersRepository;
 import com.Jobseeker.Jobseeker.justJoin.JustJoinClient;
 import com.Jobseeker.Jobseeker.justJoin.JustJoinConnector;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -82,8 +85,8 @@ public class JobseekerService {
         }
     }
 
-
-    public List<FavoriteOffers> getFavoriteOffers() {
-        return favoriteOffersRepository.findAll();
+    public Page<FavoriteOffers> getFavoriteOffers() {
+        Pageable pageable = PageRequest.of(0, 3);
+        return favoriteOffersRepository.findAll(pageable);
     }
 }

@@ -3,6 +3,7 @@ package com.Jobseeker.Jobseeker;
 
 import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -68,9 +68,9 @@ public class JobseekerController {
     }
 
     @GetMapping("/favorites")
-    public String showFavorites(Model model) {
-        LinkedList<FavoriteOffers> favoriteOffers = new LinkedList<>(jobseekerService.getFavoriteOffers());
-        model.addAttribute("favorites", favoriteOffers);
+    public String getFavoriteOffers(Model model) {
+        Page<FavoriteOffers> favoriteOffersPage = jobseekerService.getFavoriteOffers();
+        model.addAttribute("favorites", favoriteOffersPage);
         return "favorites";
     }
 
