@@ -1,5 +1,6 @@
 package com.Jobseeker.Jobseeker;
 
+
 import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 public class JobseekerController {
 
     private final JobseekerService jobseekerService;
-
+    List<Offers> offersList = new ArrayList<>();
     @Autowired
     public JobseekerController(JobseekerService jobseekerService) {
         this.jobseekerService = jobseekerService;
@@ -36,7 +37,7 @@ public class JobseekerController {
                             @RequestParam("experience") String experience,
                             Model model) {
         try {
-            List<Offers> offersList = new ArrayList<>();
+            offersList.clear();
             List<Offers> offers = jobseekerService.getOffers(location, technology, experience);
 
             for(Offers o : offers) {
@@ -53,11 +54,17 @@ public class JobseekerController {
         }
     }
 
+    @GetMapping("/offers")
+    public String refreshOffers(Model model) {
+        model.addAttribute("offers", offersList);
+        return "offers";
+    }
+
     @PostMapping("/favorites")
     public String addToFavorite(@ModelAttribute Offers offer) {
         jobseekerService.addToFavorite(offer);
 
-        return "redirect:/favorites";
+        return "redirect:/offers";
     }
 
     @GetMapping("/favorites")

@@ -1,5 +1,6 @@
 package com.Jobseeker.Jobseeker.bulldogJob;
 
+
 import com.Jobseeker.Jobseeker.Offers;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,7 +14,7 @@ import java.util.List;
 @Component
 public class BulldogJobConnector {
 
-    public List<Offers> getBulldogJob(String html) {
+    public List<Offers> bulldogJobParser(String html) {
         Document doc = Jsoup.parse(html);
         Elements jobs = doc.select(".JobListItem_item__M79JI");
 //        System.out.println(jobs);

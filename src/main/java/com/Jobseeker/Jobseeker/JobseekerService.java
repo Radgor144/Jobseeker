@@ -4,10 +4,11 @@ import com.Jobseeker.Jobseeker.bulldogJob.BulldogJobClient;
 import com.Jobseeker.Jobseeker.bulldogJob.BulldogJobConnector;
 import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffers;
 import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffersRepository;
-import com.Jobseeker.Jobseeker.justJoinIT.JustJoinClient;
-import com.Jobseeker.Jobseeker.justJoinIT.JustJoinConnector;
+import com.Jobseeker.Jobseeker.justJoin.JustJoinClient;
+import com.Jobseeker.Jobseeker.justJoin.JustJoinConnector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,25 +40,37 @@ public class JobseekerService {
         this.favoriteOffersRepository = favoriteOffersRepository;
     }
 
-    public List<Offers> getOffers(String location, String technology, String experience) throws IOException, ExecutionException, InterruptedException {
-        List<Offers> offersList = new ArrayList<>();
-
-        CompletableFuture<List<Offers>> watek1 = CompletableFuture.supplyAsync(() -> {
+    @Async
+    public CompletableFuture<List<Offers>> getJustJoinOffers(String location, String technology, String experience) {
+        return CompletableFuture.supplyAsync(() -> {
             ResponseEntity<String> response = justJoinClient.getOffers(location, technology, experience);
             String html = response.getBody();
-            offersList.addAll(justJoinConnector.getJustJoin(html));
-            return offersList;
+            return justJoinConnector.justJoinParser(html);
         });
+    }
 
-        CompletableFuture<List<Offers>> watek2 = CompletableFuture.supplyAsync(() -> {
+    @Async
+    public CompletableFuture<List<Offers>> getBulldogJobOffers(String location, String technology, String experience) {
+        return CompletableFuture.supplyAsync(() -> {
             String bulldogExperience = "mid".equals(experience) ? "medium" : experience;
             ResponseEntity<String> response = bulldogJobClient.getOffers(location, technology, bulldogExperience);
             String html = response.getBody();
-            offersList.addAll(bulldogJobConnector.getBulldogJob(html));
-            return offersList;
+            return bulldogJobConnector.bulldogJobParser(html);
         });
+    }
 
-        watek1.get();
+    public List<Offers> getOffers(String location, String technology, String experience) throws IOException, ExecutionException, InterruptedException {
+        List<Offers> offersList = new ArrayList<>();
+
+        CompletableFuture<List<Offers>> justJoinFuture = getJustJoinOffers(location, technology, experience);
+        CompletableFuture<List<Offers>> bulldogJobFuture = getBulldogJobOffers(location, technology, experience);
+
+        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(justJoinFuture, bulldogJobFuture);
+        combinedFuture.get();
+
+        offersList.addAll(justJoinFuture.get());
+        offersList.addAll(bulldogJobFuture.get());
+
         return offersList;
     }
 

@@ -1,4 +1,4 @@
-package com.Jobseeker.Jobseeker.justJoinIT;
+package com.Jobseeker.Jobseeker.justJoin;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
