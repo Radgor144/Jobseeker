@@ -1,0 +1,17 @@
+package com.Jobseeker.Jobseeker.bulldogJob;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+@FeignClient(name = "bulldogJobClient", url = "https://bulldogjob.pl/companies/jobs/s")
+public interface BulldogJobClient {
+
+    @GetMapping("city,{location}/skills,{technology}/experienceLevel,{experience}")
+    ResponseEntity<String> getOffers(
+            @PathVariable("location") String location,
+            @PathVariable("technology") String technology,
+            @PathVariable("experience") String experience
+    );
+}
