@@ -1,7 +1,6 @@
 package com.Jobseeker.Jobseeker.bulldogJob;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -9,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface BulldogJobClient {
 
     @GetMapping("city,{location}/skills,{technology}/experienceLevel,{experience}")
-    ResponseEntity<String> getOffers(
+    public String getOffers(
             @PathVariable("location") String location,
             @PathVariable("technology") String technology,
             @PathVariable("experience") String experience

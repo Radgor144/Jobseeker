@@ -7,10 +7,11 @@ import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffersRepository;
 import com.Jobseeker.Jobseeker.justJoin.JustJoinClient;
 import com.Jobseeker.Jobseeker.justJoin.JustJoinConnector;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,52 +30,39 @@ public class JobseekerService {
     private final BulldogJobClient bulldogJobClient;
     private final BulldogJobConnector bulldogJobConnector;
     private final FavoriteOffersRepository favoriteOffersRepository;
+    private final TaskExecutor taskExecutor;
 
     @Autowired
     public JobseekerService(JustJoinClient justJoinClient,
                             JustJoinConnector justJoinConnector,
                             BulldogJobClient bulldogJobClient,
                             BulldogJobConnector bulldogJobConnector,
-                            FavoriteOffersRepository favoriteOffersRepository) {
+                            FavoriteOffersRepository favoriteOffersRepository,
+                            @Qualifier("threadPoolTaskExecutor") TaskExecutor taskExecutor) {
         this.justJoinClient = justJoinClient;
         this.justJoinConnector = justJoinConnector;
         this.bulldogJobClient = bulldogJobClient;
         this.bulldogJobConnector = bulldogJobConnector;
         this.favoriteOffersRepository = favoriteOffersRepository;
+        this.taskExecutor = taskExecutor;
     }
-
-    @Async
-    public CompletableFuture<List<Offers>> getJustJoinOffers(String location, String technology, String experience) {
-        return CompletableFuture.supplyAsync(() -> {
-            ResponseEntity<String> response = justJoinClient.getOffers(location, technology, experience);
-            String html = response.getBody();
-            return justJoinConnector.justJoinParser(html);
-        });
-    }
-
-    @Async
-    public CompletableFuture<List<Offers>> getBulldogJobOffers(String location, String technology, String experience) {
-        return CompletableFuture.supplyAsync(() -> {
-            String bulldogExperience = "mid".equals(experience) ? "medium" : experience;
-            ResponseEntity<String> response = bulldogJobClient.getOffers(location, technology, bulldogExperience);
-            String html = response.getBody();
-            return bulldogJobConnector.bulldogJobParser(html);
-        });
-    }
-
-    public List<Offers> getOffers(String location, String technology, String experience) throws IOException, ExecutionException, InterruptedException {
+    @Async("threadPoolTaskExecutor")
+    public CompletableFuture<List<Offers>> getOffers(String location, String technology, String experience) throws IOException, ExecutionException, InterruptedException {
         List<Offers> offersList = new ArrayList<>();
 
-        CompletableFuture<List<Offers>> justJoinFuture = getJustJoinOffers(location, technology, experience);
-        CompletableFuture<List<Offers>> bulldogJobFuture = getBulldogJobOffers(location, technology, experience);
+        CompletableFuture<Void> future1 = CompletableFuture.runAsync(() -> {
+            String response = justJoinClient.getOffers(location, technology, experience);
+            offersList.addAll(justJoinConnector.justJoinParser(response));
+        }, taskExecutor);
 
-        CompletableFuture<Void> combinedFuture = CompletableFuture.allOf(justJoinFuture, bulldogJobFuture);
-        combinedFuture.get();
+        CompletableFuture<Void> future2 = CompletableFuture.runAsync(() -> {
+            String bulldogExperience = "mid".equals(experience) ? "medium" : experience;
+            String response = bulldogJobClient.getOffers(location, technology, bulldogExperience);
+            offersList.addAll(bulldogJobConnector.bulldogJobParser(response));
+        }, taskExecutor);
 
-        offersList.addAll(justJoinFuture.get());
-        offersList.addAll(bulldogJobFuture.get());
-
-        return offersList;
+        return CompletableFuture.allOf(future1, future2)
+                .thenApplyAsync((Void) -> offersList);
     }
 
     @Transactional
@@ -84,6 +72,7 @@ public class JobseekerService {
             favoriteOffersRepository.save(favoriteOffer);
         }
     }
+
 
     public Page<FavoriteOffers> getFavoriteOffers() {
         Pageable pageable = PageRequest.of(0, 3);

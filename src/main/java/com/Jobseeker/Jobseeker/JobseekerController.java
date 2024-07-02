@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @Controller
@@ -38,7 +39,9 @@ public class JobseekerController {
                             Model model) {
         try {
             offersList.clear();
-            List<Offers> offers = jobseekerService.getOffers(location, technology, experience);
+            CompletableFuture<List<Offers>> offersFuture = jobseekerService.getOffers(location, technology, experience);
+            List<Offers> offers = offersFuture.get();
+
 
             for(Offers o : offers) {
                 Offers offer = new Offers(o.name(), o.salary(), o.link());
