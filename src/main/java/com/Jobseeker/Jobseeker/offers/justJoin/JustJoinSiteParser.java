@@ -1,4 +1,4 @@
-package com.Jobseeker.Jobseeker.justJoin;
+package com.Jobseeker.Jobseeker.offers.justJoin;
 
 import com.Jobseeker.Jobseeker.Offers;
 import org.jsoup.Jsoup;
@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class JustJoinConnector {
+class JustJoinSiteParser {
 
-    public List<Offers> justJoinParser(String html) {
+    List<Offers> parse(String html) {
         Document doc = Jsoup.parse(html);
         Elements jobs = doc.select("div[data-index]");
         Elements links = doc.select("a.offer_list_offer_link");

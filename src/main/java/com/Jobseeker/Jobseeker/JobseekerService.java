@@ -1,13 +1,13 @@
 package com.Jobseeker.Jobseeker;
 
-import com.Jobseeker.Jobseeker.BulldogJob.BulldogJobClient;
-import com.Jobseeker.Jobseeker.BulldogJob.BulldogJobConnector;
 import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffers;
 import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffersRepository;
 import com.Jobseeker.Jobseeker.justJoin.JustJoinClient;
-import com.Jobseeker.Jobseeker.justJoin.JustJoinConnector;
-import com.Jobseeker.Jobseeker.pracujPl.PracujPlClient;
-import com.Jobseeker.Jobseeker.pracujPl.PracujPlConnector;
+import com.Jobseeker.Jobseeker.justJoin.JustJoinSiteParser;
+import com.Jobseeker.Jobseeker.offers.BulldogJob.BulldogJobClient;
+import com.Jobseeker.Jobseeker.offers.BulldogJob.BulldogJobConnector;
+import com.Jobseeker.Jobseeker.offers.pracujPl.PracujPlClient;
+import com.Jobseeker.Jobseeker.offers.pracujPl.PracujPlConnector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutionException;
 public class JobseekerService {
 
     private final JustJoinClient justJoinClient;
-    private final JustJoinConnector justJoinConnector;
+    private final JustJoinSiteParser justJoinSiteParser;
     private final BulldogJobClient bulldogJobClient;
     private final BulldogJobConnector bulldogJobConnector;
     private final PracujPlClient pracujPlClient;
@@ -37,13 +37,13 @@ public class JobseekerService {
     private final TaskExecutor taskExecutor;
 
     @Autowired
-    public JobseekerService(JustJoinClient justJoinClient, JustJoinConnector justJoinConnector,
+    public JobseekerService(JustJoinClient justJoinClient, JustJoinSiteParser justJoinSiteParser,
                             BulldogJobClient bulldogJobClient, BulldogJobConnector bulldogJobConnector,
                             PracujPlClient pracujPlClient, PracujPlConnector pracujPlConnector,
                             FavoriteOffersRepository favoriteOffersRepository,
                             @Qualifier("threadPoolTaskExecutor") TaskExecutor taskExecutor) {
         this.justJoinClient = justJoinClient;
-        this.justJoinConnector = justJoinConnector;
+        this.justJoinSiteParser = justJoinSiteParser;
         this.bulldogJobClient = bulldogJobClient;
         this.bulldogJobConnector = bulldogJobConnector;
         this.pracujPlClient = pracujPlClient;
@@ -79,7 +79,7 @@ public class JobseekerService {
     private CompletableFuture<Void> getJustJoinOffers(String location, String technology, String experience, List<Offers> offersList) {
         return CompletableFuture.runAsync(() -> {
             String response = justJoinClient.getOffers(location, technology, experience);
-            offersList.addAll(justJoinConnector.justJoinParser(response));
+            offersList.addAll(justJoinSiteParser.parse(response));
         }, taskExecutor);
     }
 

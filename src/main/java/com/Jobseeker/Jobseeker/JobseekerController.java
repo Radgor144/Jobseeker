@@ -2,6 +2,7 @@ package com.Jobseeker.Jobseeker;
 
 
 import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffers;
+import com.Jobseeker.Jobseeker.offers.OffersAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -11,19 +12,22 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @Controller
 public class JobseekerController {
 
+    private final OffersAggregator offersAggregator;
+
     private final JobseekerService jobseekerService;
-    List<Offers> offersList = new ArrayList<>();
+
+    private List<Offers> offers = new ArrayList<>();
+
     @Autowired
-    public JobseekerController(JobseekerService jobseekerService) {
+    public JobseekerController(JobseekerService jobseekerService, OffersAggregator offersAggregator) {
+        this.offersAggregator = offersAggregator;
         this.jobseekerService = jobseekerService;
     }
 
@@ -34,24 +38,16 @@ public class JobseekerController {
 
     @PostMapping("/offers")
     public String searchJobOffers(@RequestParam("location") String location,
-                            @RequestParam("technology") String technology,
-                            @RequestParam("experience") String experience,
-                            Model model) {
+                                  @RequestParam("technology") String technology,
+                                  @RequestParam("experience") String experience,
+                                  Model model) {
         try {
-            offersList.clear();
-            CompletableFuture<List<Offers>> offersFuture = jobseekerService.getOffers(location, technology, experience);
-            List<Offers> offers = offersFuture.get();
+            offers = offersAggregator.aggregateOffers(location, technology, experience);
 
-            for(Offers o : offers) {
-                Offers offer = new Offers(o.name(), o.salary(), o.link());
-                offersList.add(offer);
-            }
-
-            model.addAttribute("offers", offersList);
+            model.addAttribute("offers", offers);
             return "offers";
 
-
-        } catch (IOException | ExecutionException | InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
             return "error";
         }
@@ -59,7 +55,7 @@ public class JobseekerController {
 
     @GetMapping("/offers")
     public String refreshOffers(Model model) {
-        model.addAttribute("offers", offersList);
+        model.addAttribute("offers", offers);
         return "offers";
     }
 
