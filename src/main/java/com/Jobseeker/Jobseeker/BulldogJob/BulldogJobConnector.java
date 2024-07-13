@@ -1,4 +1,4 @@
-package com.Jobseeker.Jobseeker.bulldogJob;
+package com.Jobseeker.Jobseeker.BulldogJob;
 
 
 import com.Jobseeker.Jobseeker.Offers;
@@ -17,12 +17,10 @@ public class BulldogJobConnector {
     public List<Offers> bulldogJobParser(String html) {
         Document doc = Jsoup.parse(html);
         Elements jobs = doc.select(".JobListItem_item__M79JI");
-//        System.out.println(jobs);
 
         List<Offers> jobList = new ArrayList<>();
 
-        for (
-                Element job: jobs) {
+        for (Element job: jobs) {
             String name = job.select(".JobListItem_item__title__Ae2Pm > h3").text();
             String salary = job.select(".JobListItem_item__salary__Jd_AJ").text();
             String href = job.attr("href");

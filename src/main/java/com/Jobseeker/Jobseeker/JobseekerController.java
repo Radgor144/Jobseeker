@@ -27,13 +27,13 @@ public class JobseekerController {
         this.jobseekerService = jobseekerService;
     }
 
-    @GetMapping("/hub")
-    public String hub() {
-        return "hub";
+    @GetMapping("/home")
+    public String home() {
+        return "home";
     }
 
     @PostMapping("/offers")
-    public String getOffers(@RequestParam("location") String location,
+    public String searchJobOffers(@RequestParam("location") String location,
                             @RequestParam("technology") String technology,
                             @RequestParam("experience") String experience,
                             Model model) {
@@ -42,11 +42,11 @@ public class JobseekerController {
             CompletableFuture<List<Offers>> offersFuture = jobseekerService.getOffers(location, technology, experience);
             List<Offers> offers = offersFuture.get();
 
-
             for(Offers o : offers) {
                 Offers offer = new Offers(o.name(), o.salary(), o.link());
                 offersList.add(offer);
             }
+
             model.addAttribute("offers", offersList);
             return "offers";
 
@@ -64,19 +64,16 @@ public class JobseekerController {
     }
 
     @PostMapping("/favorites")
-    public String addToFavorite(@ModelAttribute Offers offer) {
-        jobseekerService.addToFavorite(offer);
+    public String addOfferToFavorite(@ModelAttribute Offers offer) {
+        jobseekerService.addToFavoriteList(offer);
 
         return "redirect:/offers";
     }
 
     @GetMapping("/favorites")
     public String getFavoriteOffers(Model model) {
-        Page<FavoriteOffers> favoriteOffersPage = jobseekerService.getFavoriteOffers();
+        Page<FavoriteOffers> favoriteOffersPage = jobseekerService.getTenFavoriteOffers();
         model.addAttribute("favorites", favoriteOffersPage);
         return "favorites";
     }
-
-
-
 }
