@@ -10,7 +10,9 @@ import java.util.concurrent.ExecutionException;
 @Component
 public class OffersAggregator {
     public List<OffersFetcher> offersFetchers;
-
+    public OffersAggregator(List<OffersFetcher> offersFetchers) {
+        this.offersFetchers = offersFetchers;
+    }
     public List<Offers> aggregateOffers(String location, String technology, String experience) throws ExecutionException, InterruptedException {
         // Create a list of CompletableFutures for each externalOffersFacade
         List<CompletableFuture<List<Offers>>> futures = offersFetchers.stream()

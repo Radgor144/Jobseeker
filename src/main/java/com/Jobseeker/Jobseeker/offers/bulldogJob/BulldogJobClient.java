@@ -1,4 +1,4 @@
-package com.Jobseeker.Jobseeker.offers.BulldogJob;
+package com.Jobseeker.Jobseeker.offers.bulldogJob;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
