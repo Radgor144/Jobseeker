@@ -72,11 +72,7 @@ public class JwtService {
 
     private Key getSignInKey() {
         try {
-            System.out.println("____________");
-            System.out.println(SECRET_KEY);
-            System.out.println("____________");
             byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-            System.out.println("Key Bytes Length: " + keyBytes.length);
             return Keys.hmacShaKeyFor(keyBytes);
         } catch (Exception e) {
             throw new RuntimeException("Invalid JWT Secret Key", e);

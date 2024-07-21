@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "pracujPlClient", url = "https://it.pracuj.pl/praca")
 public interface PracujPlClient {
 
-    @GetMapping("/{location};wp/?et={technology}&itth={experience}")
+    @GetMapping("/{location};wp/?et={experience}&itth={technology}")
     public String getOffers(
             @PathVariable("location") String location,
             @PathVariable("technology") int technology,
