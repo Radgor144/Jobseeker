@@ -1,15 +1,24 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/Jobseeker
+    url: jdbc:postgresql://localhost:5432/jwt_security
     username: postgres
     password: password
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-
+        format_sql: true
     hibernate:
       ddl-auto: create-drop
+    show-sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+  jwt:
+    secret:
+      key: changeMe
 
+# L: admin P: zaq1@WSX
+# L: tester P: zaq1@WSX
+# kc.bat start-dev --http-port=8180 zeby uruchomic keycloacka

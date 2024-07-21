@@ -45,7 +45,7 @@
                 <td th:text="${offer.salary}"></td>
                 <td><a th:href="${offer.link}" target="_blank" th:text="${offer.link}"></a></td>
                 <td>
-                    <form th:action="@{/favorites}" method="post">
+                    <form th:action="@{/api/auth/favorites}" method="post">
                         <input type="hidden" name="name" th:value="${offer.name}">
                         <input type="hidden" name="salary" th:value="${offer.salary}">
                         <input type="hidden" name="link" th:value="${offer.link}">

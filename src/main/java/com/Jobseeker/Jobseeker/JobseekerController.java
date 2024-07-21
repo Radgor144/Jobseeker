@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Controller
+@RequestMapping("/api")
 public class JobseekerController {
 
     private final OffersAggregator offersAggregator;
@@ -59,14 +61,14 @@ public class JobseekerController {
         return "offers";
     }
 
-    @PostMapping("/favorites")
+    @PostMapping("/auth/favorites")
     public String addOfferToFavorite(@ModelAttribute Offers offer) {
         jobseekerService.addToFavoriteList(offer);
 
         return "redirect:/offers";
     }
 
-    @GetMapping("/favorites")
+    @GetMapping("/auth/favorites")
     public String getFavoriteOffers(Model model) {
         Page<FavoriteOffers> favoriteOffersPage = jobseekerService.getTenFavoriteOffers();
         model.addAttribute("favorites", favoriteOffersPage);
