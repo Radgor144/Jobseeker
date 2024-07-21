@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,11 @@ import java.util.function.Function;
 public class JwtService {
 
 
-    private static final String SECRET_KEY = "9147b4f15b4157f56c414d1cd3436eba5e50833aca2d47a7625c1d07aad9e2f9";
+    private final String SECRET_KEY;
 
-// todo: nie dziala pobieranie klucza z properties :(
-//    public JwtService(@Value("${jwt.secret.key:}") String secretKey) {
-//        this.SECRET_KEY = secretKey;
-//    }
+    public JwtService(@Value("${jwt.secret.key}") String secretKey) {
+        this.SECRET_KEY = secretKey;
+    }
 
 
     public String extractUsername(String token) {
