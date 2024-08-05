@@ -1,6 +1,9 @@
 package com.Jobseeker.Jobseeker.auth;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,9 +30,18 @@ public class AuthenticationController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
+            @RequestBody AuthenticationRequest request,
+            HttpServletResponse response
     ) {
-        return ResponseEntity.ok(authService.authenticate(request));
+        AuthenticationResponse accessToken = authService.authenticate(request);
+        ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken.getToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(1800)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        return ResponseEntity.ok(accessToken);
     }
 
     @GetMapping("/authenticate")

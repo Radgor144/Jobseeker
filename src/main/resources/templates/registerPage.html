@@ -100,7 +100,7 @@
 
             if (response.ok) {
                 alert('Registration successful');
-                window.location.href = '/api/home'; // Przekieruj na stronę home
+                window.location.href = '/api/authenticate'; // Przekieruj na stronę home
             } else {
                 const errorData = await response.json();
                 alert('Registration failed: ' + (errorData.message || 'Unknown error'));

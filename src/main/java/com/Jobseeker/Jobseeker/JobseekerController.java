@@ -61,14 +61,14 @@ public class JobseekerController {
         return "offers";
     }
 
-    @PostMapping("/auth/favorites")
+    @PostMapping("/favorites")
     public String addOfferToFavorite(@ModelAttribute Offers offer) {
         jobseekerService.addToFavoriteList(offer);
 
         return "redirect:/offers";
     }
 
-    @GetMapping("/auth/favorites")
+    @GetMapping("/favorites")
     public String getFavoriteOffers(Model model) {
         Page<FavoriteOffers> favoriteOffersPage = jobseekerService.getTenFavoriteOffers();
         model.addAttribute("favorites", favoriteOffersPage);
