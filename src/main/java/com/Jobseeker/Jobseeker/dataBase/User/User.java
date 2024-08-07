@@ -1,10 +1,14 @@
-package com.Jobseeker.Jobseeker;
+package com.Jobseeker.Jobseeker.dataBase.User;
 
+import com.Jobseeker.Jobseeker.dataBase.Favorite.UserFavoriteOffers;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -34,6 +39,9 @@ public class User implements UserDetails {
     private String password;
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<UserFavoriteOffers> userFavoriteOffers;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,6 +1,6 @@
 package com.Jobseeker.Jobseeker.Config;
 
-import com.Jobseeker.Jobseeker.UserRepository;
+import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

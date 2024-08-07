@@ -1,9 +1,9 @@
 package com.Jobseeker.Jobseeker.auth;
 
 import com.Jobseeker.Jobseeker.Config.JwtService;
-import com.Jobseeker.Jobseeker.Role;
-import com.Jobseeker.Jobseeker.User;
-import com.Jobseeker.Jobseeker.UserRepository;
+import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
+import com.Jobseeker.Jobseeker.dataBase.User.Role;
+import com.Jobseeker.Jobseeker.dataBase.User.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
