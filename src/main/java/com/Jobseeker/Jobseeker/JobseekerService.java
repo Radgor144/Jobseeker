@@ -1,14 +1,16 @@
 package com.Jobseeker.Jobseeker;
 
-import com.Jobseeker.Jobseeker.dataBase.Favorite.ListOfOffers;
+import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersInDB;
 import com.Jobseeker.Jobseeker.dataBase.Favorite.UserFavoriteOffers;
 import com.Jobseeker.Jobseeker.dataBase.Repositories.ListOfOffersRepository;
 import com.Jobseeker.Jobseeker.dataBase.Repositories.UserFavoriteOffersRepository;
 import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
 import com.Jobseeker.Jobseeker.dataBase.User.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class JobseekerService {
@@ -25,26 +27,30 @@ public class JobseekerService {
     }
 
 
-//    @Transactional
-//    public void addToFavoriteList(Offers offer) {
-//        if (!favoriteOffersRepository.existsByNameAndSalaryAndLink(offer.name(), offer.salary(), offer.link())) {
-//            FavoriteOffers favoriteOffer = new FavoriteOffers(offer.name(), offer.salary(), offer.link());
-//            favoriteOffersRepository.save(favoriteOffer);
-//        }
-//    }
+    @Transactional
+    public void addToDataBase(List<Offers> offers) {
+        List<OffersInDB> offersInDBList = offers.stream()
+                .map(this::mapToOffersInDB)
+                .collect(Collectors.toList());
+        listOfOffersRepository.saveAll(offersInDBList);
+    }
+
+    private OffersInDB mapToOffersInDB(Offers offer) {
+        return new OffersInDB(null, offer.name(), offer.salary(), offer.link(), null);
+    }
 
     public void addFavorite(Long userId, Long favoriteOfferId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        ListOfOffers listOfOffers = listOfOffersRepository.findById(favoriteOfferId)
+        OffersInDB offersInDB = listOfOffersRepository.findById(favoriteOfferId)
                 .orElseThrow(() -> new RuntimeException("Favorite Offer not found"));
 
-        UserFavoriteOffers userFavoriteOffers = new UserFavoriteOffers(user, listOfOffers);
+        UserFavoriteOffers userFavoriteOffers = new UserFavoriteOffers(user, offersInDB);
         userFavoriteOffersRepository.save(userFavoriteOffers);
     }
 
-    public List<ListOfOffers> getFavorites(Long userId) {
+    public List<OffersInDB> getFavorites(Long userId) {
         return listOfOffersRepository.findByUserFavoriteOffers_UserId(userId);
     }
 

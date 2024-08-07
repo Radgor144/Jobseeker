@@ -17,7 +17,7 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListOfOffers {
+public class OffersInDB {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,7 +26,7 @@ public class ListOfOffers {
     private String salary;
     private String link;
 
-    @OneToMany(mappedBy = "listOfOffers", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "offersInDB", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<UserFavoriteOffers> userFavoriteOffers;
 }
 

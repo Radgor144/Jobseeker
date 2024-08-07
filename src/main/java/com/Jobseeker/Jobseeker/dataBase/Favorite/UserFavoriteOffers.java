@@ -26,11 +26,11 @@ public class UserFavoriteOffers {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "listOfOffers_id")
-    private ListOfOffers listOfOffers;
+    @JoinColumn(name = "offersInDB_id")
+    private OffersInDB offersInDB;
 
-    public UserFavoriteOffers(User user, ListOfOffers listOfOffers) {
+    public UserFavoriteOffers(User user, OffersInDB offersInDB) {
         this.user = user;
-        this.listOfOffers = listOfOffers;
+        this.offersInDB = offersInDB;
     }
 }

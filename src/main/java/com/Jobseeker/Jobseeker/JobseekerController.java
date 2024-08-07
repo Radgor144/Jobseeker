@@ -1,7 +1,7 @@
 package com.Jobseeker.Jobseeker;
 
 
-import com.Jobseeker.Jobseeker.dataBase.Favorite.ListOfOffers;
+import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersInDB;
 import com.Jobseeker.Jobseeker.offers.OffersAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +31,9 @@ public class JobseekerController {
     public List<Offers> searchJobOffers(@RequestParam("location") String location,
                                         @RequestParam("technology") String technology,
                                         @RequestParam("experience") String experience) throws ExecutionException, InterruptedException {
-            return offersAggregator.aggregateOffers(location, technology, experience);
+            List<Offers> offers = offersAggregator.aggregateOffers(location, technology, experience);
+             jobseekerService.addToDataBase(offers);
+             return offers;
     }
 
     @PostMapping("/add")
@@ -41,7 +43,7 @@ public class JobseekerController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<ListOfOffers>> getFavorites(@RequestParam Long userId) {
+    public ResponseEntity<List<OffersInDB>> getFavorites(@RequestParam Long userId) {
         return ResponseEntity.ok(jobseekerService.getFavorites(userId));
     }
 }
