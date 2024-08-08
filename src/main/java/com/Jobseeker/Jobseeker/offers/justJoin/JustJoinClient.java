@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "justJoinClient", url = "https://justjoin.it")
-interface JustJoinClient {
+public interface JustJoinClient {
 
     @GetMapping("/{location}/{technology}/experience-level_{experience}")
     String getOffers(
