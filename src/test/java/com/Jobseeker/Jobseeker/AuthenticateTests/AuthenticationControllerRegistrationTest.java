@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
-public class UserRegistrationTests {
+public class AuthenticationControllerRegistrationTest {
 
     @InjectMocks
     private AuthenticationController authController;
