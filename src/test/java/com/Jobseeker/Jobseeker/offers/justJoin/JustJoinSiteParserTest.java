@@ -1,18 +1,14 @@
-package com.Jobseeker.Jobseeker.ParsersTests;
+package com.Jobseeker.Jobseeker.offers.justJoin;
 
 import com.Jobseeker.Jobseeker.Offers;
-import com.Jobseeker.Jobseeker.offers.justJoin.JustJoinSiteParser;
 import org.junit.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-
-@SpringBootTest
 public class JustJoinSiteParserTest {
 
     @Test
@@ -32,16 +28,7 @@ public class JustJoinSiteParserTest {
     }
 
     private String openFileWithData(String filePath) throws IOException {
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            StringBuilder content = new StringBuilder();
-
-            // Read the file line by line
-            while ((line = bufferedReader.readLine()) != null) {
-                content.append(line).append("\n");
-            }
-            return content.toString().trim();
-        }
+        return Files.readString(Path.of(filePath));
     }
 
 }

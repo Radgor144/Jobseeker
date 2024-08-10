@@ -31,9 +31,9 @@ public class JobseekerController {
     public List<Offers> searchJobOffers(@RequestParam("location") String location,
                                         @RequestParam("technology") String technology,
                                         @RequestParam("experience") String experience) throws ExecutionException, InterruptedException {
-            List<Offers> offers = offersAggregator.aggregateOffers(location, technology, experience);
-            jobseekerService.addToDataBase(offers);
-            return offers;
+        List<Offers> offers = offersAggregator.aggregateOffers(location, technology, experience);
+        jobseekerService.addToDataBase(offers);
+        return offers;
     }
 
     @PostMapping("/add")

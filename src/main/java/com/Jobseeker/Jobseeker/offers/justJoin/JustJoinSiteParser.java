@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class JustJoinSiteParser {
+class JustJoinSiteParser {
 
-    public List<Offers> parse(String html) {
+    List<Offers> parse(String html) {
         Document doc = Jsoup.parse(html);
         Elements jobs = doc.select("div[data-index]");
         Elements links = doc.select("a.offer_list_offer_link");
