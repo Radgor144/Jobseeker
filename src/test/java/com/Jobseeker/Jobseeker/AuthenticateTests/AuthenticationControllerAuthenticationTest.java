@@ -1,10 +1,9 @@
 package com.Jobseeker.Jobseeker.AuthenticateTests;
 
 import com.Jobseeker.Jobseeker.Config.JwtService;
-import com.Jobseeker.Jobseeker.auth.RegisterRequest;
+import com.Jobseeker.Jobseeker.auth.AuthenticationRequest;
 import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
 import com.Jobseeker.Jobseeker.dataBase.User.User;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,19 +12,23 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
 
-@Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(SpringExtension.class)
-public class AuthenticationControllerRegistrationTest {
+public class AuthenticationControllerAuthenticationTest {
 
     @Autowired
     private WebTestClient webTestClient;
@@ -36,21 +39,36 @@ public class AuthenticationControllerRegistrationTest {
     @MockBean
     private JwtService jwtService;
 
+    @MockBean
+    private AuthenticationManager authenticationManager;
+
     @Test
-    public void shouldReturnJwtTokenWhenUserRegistersSuccessfully() {
+    void shouldReturnJwtTokenWhenUserAuthenticateSuccessfully() {
         // given
         String expectedToken = "mocked-jwt-token";
-        RegisterRequest registerRequest = new RegisterRequest("john", "snow", "john.snow@gmail.com", "password");
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest("john.snow@gmail.com", "password");
 
-        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
-        when(jwtService.generateToken(any(User.class))).thenReturn(expectedToken);
+        User mockUser = new User();
+        mockUser.setEmail(authenticationRequest.getEmail());
+        mockUser.setPassword(authenticationRequest.getPassword());
+
+        Authentication mockAuthentication = new UsernamePasswordAuthenticationToken(mockUser.getEmail(), mockUser.getPassword());
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(mockAuthentication);
+
+        when(userRepository.findByEmail(authenticationRequest.getEmail()))
+                .thenReturn(Optional.of(mockUser));
+        
+        when(jwtService.generateToken(any(User.class)))
+                .thenReturn(expectedToken);
 
         // when
         webTestClient
                 .post()
-                .uri("/api/auth/signup")
+                .uri("/api/auth/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(registerRequest)
+                .bodyValue(authenticationRequest)
                 .exchange()
                 // then
                 .expectStatus().isEqualTo(OK)

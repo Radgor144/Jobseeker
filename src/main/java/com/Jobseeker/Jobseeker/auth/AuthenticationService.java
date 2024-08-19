@@ -5,11 +5,13 @@ import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
 import com.Jobseeker.Jobseeker.dataBase.User.Role;
 import com.Jobseeker.Jobseeker.dataBase.User.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
