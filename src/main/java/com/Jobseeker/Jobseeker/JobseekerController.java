@@ -41,6 +41,11 @@ public class JobseekerController {
         jobseekerService.addFavorite(userId, favoriteOfferId);
         return ResponseEntity.ok("Offer added to favorites");
     }
+    @PostMapping("/delete")
+    public ResponseEntity<?> deleteFavorite(@RequestParam Long userId, @RequestParam Long favoriteOfferId) {
+        jobseekerService.deleteFavorite(userId, favoriteOfferId);
+        return ResponseEntity.ok("Offer deleted from favorites");
+    }
 
     @GetMapping("/list")
     public ResponseEntity<List<OffersInDB>> getFavorites(@RequestParam Long userId) {

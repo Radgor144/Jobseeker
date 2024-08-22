@@ -49,6 +49,19 @@ public class JobseekerService {
         UserFavoriteOffers userFavoriteOffers = new UserFavoriteOffers(user, offersInDB);
         userFavoriteOffersRepository.save(userFavoriteOffers);
     }
+    public void deleteFavorite(Long userId, Long favoriteOfferId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        OffersInDB offersInDB = listOfOffersRepository.findById(favoriteOfferId)
+                .orElseThrow(() -> new RuntimeException("Favorite Offer not found"));
+        userRepository.deleteById(favoriteOfferId);
+
+        UserFavoriteOffers userFavoriteOffers = userFavoriteOffersRepository.findByUserAndOffersInDB(user, offersInDB)
+                .orElseThrow(() -> new RuntimeException("Favorite Offer not found in user's favorites"));
+
+        userFavoriteOffersRepository.delete(userFavoriteOffers);
+    }
 
     public List<OffersInDB> getFavorites(Long userId) {
         return listOfOffersRepository.findByUserFavoriteOffers_UserId(userId);
