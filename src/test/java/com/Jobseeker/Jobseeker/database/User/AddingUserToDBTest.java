@@ -14,13 +14,13 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-public class AddingUserToDB {
+public class AddingUserToDBTest {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    TestEntityManager entityManager;
+    private TestEntityManager entityManager;
 
     @Test
     void shouldAddUserToDB() {
