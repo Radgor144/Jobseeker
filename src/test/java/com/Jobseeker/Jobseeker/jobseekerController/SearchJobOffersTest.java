@@ -3,8 +3,10 @@ package com.Jobseeker.Jobseeker.jobseekerController;
 import com.Jobseeker.Jobseeker.Config.JwtService;
 import com.Jobseeker.Jobseeker.Offers;
 import com.Jobseeker.Jobseeker.auth.RegisterRequest;
-import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersInDB;
+import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersEntity;
 import com.Jobseeker.Jobseeker.dataBase.Repositories.ListOfOffersRepository;
+import com.Jobseeker.Jobseeker.dataBase.Repositories.UserFavoriteOffersRepository;
+import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
 import com.Jobseeker.Jobseeker.dataBase.User.Role;
 import com.Jobseeker.Jobseeker.dataBase.User.User;
 import com.Jobseeker.Jobseeker.util.JsonFileReaderToList;
@@ -13,6 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,6 +45,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @AutoConfigureWireMock(port = 0)
 @AutoConfigureWebTestClient
 @ExtendWith(SpringExtension.class)
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 public class SearchJobOffersTest {
 
     public static final String URL = "/api/secure/offers?location=krakow&technology=java&experience=junior";
@@ -60,6 +65,12 @@ public class SearchJobOffersTest {
 
     @MockBean
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private UserFavoriteOffersRepository userFavoriteOffersRepository;
 
     @Test
     void shouldAddOffersToDB() throws Exception {
@@ -100,11 +111,11 @@ public class SearchJobOffersTest {
                 .expectBody();
 
 
-        List<OffersInDB> offersInDBList = listOfOffersRepository.findAll();
-        System.out.println(offersInDBList);
+        List<OffersEntity> offersEntityList = listOfOffersRepository.findAll();
+        System.out.println(offersEntityList);
 
         for (Offers expectedOffer : expectedOffersData) {
-            boolean found = offersInDBList.stream()
+            boolean found = offersEntityList.stream()
                     .anyMatch(offerInDB -> offerInDB.equals(expectedOffer));
             assertThat(found).isTrue();
         }

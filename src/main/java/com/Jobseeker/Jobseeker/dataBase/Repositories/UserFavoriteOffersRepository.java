@@ -1,6 +1,6 @@
 package com.Jobseeker.Jobseeker.dataBase.Repositories;
 
-import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersInDB;
+import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersEntity;
 import com.Jobseeker.Jobseeker.dataBase.Favorite.UserFavoriteOffers;
 import com.Jobseeker.Jobseeker.dataBase.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface UserFavoriteOffersRepository extends JpaRepository<UserFavoriteOffers, Long> {
-    List<OffersInDB> findByUserId(Long userId);
-    Optional<UserFavoriteOffers> findByUserAndOffersInDB(User user, OffersInDB offersInDB);
+    List<OffersEntity> findByUserId(Long userId);
+    Optional<UserFavoriteOffers> findByUserAndOffersEntity(User user, OffersEntity offersEntity);
+
+    Optional<UserFavoriteOffers> findByUserIdAndOffersEntityId(Long userId, Long favoriteOfferId);
 }

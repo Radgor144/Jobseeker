@@ -1,7 +1,7 @@
 package com.Jobseeker.Jobseeker;
 
 
-import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersInDB;
+import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersEntity;
 import com.Jobseeker.Jobseeker.offers.OffersAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -42,13 +42,13 @@ public class JobseekerController {
         return ResponseEntity.ok("Offer added to favorites");
     }
     @PostMapping("/delete")
-    public ResponseEntity<?> deleteFavorite(@RequestParam Long userId, @RequestParam Long favoriteOfferId) {
+    public String deleteFavorite(@RequestParam Long userId, @RequestParam Long favoriteOfferId) {
         jobseekerService.deleteFavorite(userId, favoriteOfferId);
-        return ResponseEntity.ok("Offer deleted from favorites");
+        return "Offer deleted from favorites";
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<OffersInDB>> getFavorites(@RequestParam Long userId) {
+    public ResponseEntity<List<OffersEntity>> getFavorites(@RequestParam Long userId) {
         return ResponseEntity.ok(jobseekerService.getFavorites(userId));
     }
 }

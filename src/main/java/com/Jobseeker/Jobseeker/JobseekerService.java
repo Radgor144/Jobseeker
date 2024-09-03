@@ -1,6 +1,6 @@
 package com.Jobseeker.Jobseeker;
 
-import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersInDB;
+import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersEntity;
 import com.Jobseeker.Jobseeker.dataBase.Favorite.UserFavoriteOffers;
 import com.Jobseeker.Jobseeker.dataBase.Repositories.ListOfOffersRepository;
 import com.Jobseeker.Jobseeker.dataBase.Repositories.UserFavoriteOffersRepository;
@@ -29,41 +29,34 @@ public class JobseekerService {
 
     @Transactional
     public void addToDataBase(List<Offers> offers) {
-        List<OffersInDB> offersInDBList = offers.stream()
-                .map(this::mapToOffersInDB)
+        List<OffersEntity> offersEntityList = offers.stream()
+                .map(this::mapToOffersEntity)
                 .collect(Collectors.toList());
-        listOfOffersRepository.saveAll(offersInDBList);
+        listOfOffersRepository.saveAll(offersEntityList);
     }
 
-    private OffersInDB mapToOffersInDB(Offers offer) {
-        return new OffersInDB(null, offer.name(), offer.salary(), offer.link(), null);
+    private OffersEntity mapToOffersEntity(Offers offer) {
+        return new OffersEntity(null, offer.name(), offer.salary(), offer.link(), null);
     }
 
     public void addFavorite(Long userId, Long favoriteOfferId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        OffersInDB offersInDB = listOfOffersRepository.findById(favoriteOfferId)
+        OffersEntity offersEntity = listOfOffersRepository.findById(favoriteOfferId)
                 .orElseThrow(() -> new RuntimeException("Favorite Offer not found"));
 
-        UserFavoriteOffers userFavoriteOffers = new UserFavoriteOffers(user, offersInDB);
+        UserFavoriteOffers userFavoriteOffers = new UserFavoriteOffers(user, offersEntity);
         userFavoriteOffersRepository.save(userFavoriteOffers);
     }
     public void deleteFavorite(Long userId, Long favoriteOfferId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        OffersInDB offersInDB = listOfOffersRepository.findById(favoriteOfferId)
-                .orElseThrow(() -> new RuntimeException("Favorite Offer not found"));
-        userRepository.deleteById(favoriteOfferId);
-
-        UserFavoriteOffers userFavoriteOffers = userFavoriteOffersRepository.findByUserAndOffersInDB(user, offersInDB)
+        UserFavoriteOffers userFavoriteOffer = userFavoriteOffersRepository.findByUserIdAndOffersEntityId(userId, favoriteOfferId)
                 .orElseThrow(() -> new RuntimeException("Favorite Offer not found in user's favorites"));
 
-        userFavoriteOffersRepository.delete(userFavoriteOffers);
+        userFavoriteOffersRepository.delete(userFavoriteOffer);
     }
 
-    public List<OffersInDB> getFavorites(Long userId) {
+    public List<OffersEntity> getFavorites(Long userId) {
         return listOfOffersRepository.findByUserFavoriteOffers_UserId(userId);
     }
 
