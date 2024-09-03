@@ -2,6 +2,7 @@ package com.Jobseeker.Jobseeker.AuthenticateTests;
 
 import com.Jobseeker.Jobseeker.Config.JwtService;
 import com.Jobseeker.Jobseeker.auth.AuthenticationRequest;
+import com.Jobseeker.Jobseeker.auth.AuthenticationResponse;
 import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
 import com.Jobseeker.Jobseeker.dataBase.User.User;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
@@ -64,7 +66,7 @@ public class AuthenticationControllerAuthenticationTest {
                 .thenReturn(expectedToken);
 
         // when
-        webTestClient
+        var response = webTestClient
                 .post()
                 .uri("/api/auth/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -72,7 +74,10 @@ public class AuthenticationControllerAuthenticationTest {
                 .exchange()
                 // then
                 .expectStatus().isEqualTo(OK)
-                .expectBody()
-                .jsonPath("$.token").isEqualTo(expectedToken);
+                .expectBody(AuthenticationResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertEquals(response.getToken(), expectedToken);
     }
 }
