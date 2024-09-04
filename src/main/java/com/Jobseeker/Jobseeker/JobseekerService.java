@@ -1,11 +1,11 @@
 package com.Jobseeker.Jobseeker;
 
-import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersEntity;
-import com.Jobseeker.Jobseeker.dataBase.Favorite.UserFavoriteOffers;
-import com.Jobseeker.Jobseeker.dataBase.Repositories.ListOfOffersRepository;
-import com.Jobseeker.Jobseeker.dataBase.Repositories.UserFavoriteOffersRepository;
-import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
-import com.Jobseeker.Jobseeker.dataBase.User.User;
+import com.Jobseeker.Jobseeker.dataBase.favorite.OffersEntity;
+import com.Jobseeker.Jobseeker.dataBase.favorite.UserFavoriteOffers;
+import com.Jobseeker.Jobseeker.dataBase.repositories.OffersEntityRepository;
+import com.Jobseeker.Jobseeker.dataBase.repositories.UserFavoriteOffersRepository;
+import com.Jobseeker.Jobseeker.dataBase.repositories.UserRepository;
+import com.Jobseeker.Jobseeker.dataBase.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,14 +16,14 @@ import java.util.stream.Collectors;
 public class JobseekerService {
     private final UserFavoriteOffersRepository userFavoriteOffersRepository;
     private final UserRepository userRepository;
-    private final ListOfOffersRepository listOfOffersRepository;
+    private final OffersEntityRepository offersEntityRepository;
 
     public JobseekerService(UserFavoriteOffersRepository userFavoriteOffersRepository,
                             UserRepository userRepository,
-                            ListOfOffersRepository listOfOffersRepository) {
+                            OffersEntityRepository offersEntityRepository) {
         this.userFavoriteOffersRepository = userFavoriteOffersRepository;
         this.userRepository = userRepository;
-        this.listOfOffersRepository = listOfOffersRepository;
+        this.offersEntityRepository = offersEntityRepository;
     }
 
 
@@ -32,7 +32,7 @@ public class JobseekerService {
         List<OffersEntity> offersEntityList = offers.stream()
                 .map(this::mapToOffersEntity)
                 .collect(Collectors.toList());
-        listOfOffersRepository.saveAll(offersEntityList);
+        offersEntityRepository.saveAll(offersEntityList);
     }
 
     private OffersEntity mapToOffersEntity(Offers offer) {
@@ -43,7 +43,7 @@ public class JobseekerService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        OffersEntity offersEntity = listOfOffersRepository.findById(favoriteOfferId)
+        OffersEntity offersEntity = offersEntityRepository.findById(favoriteOfferId)
                 .orElseThrow(() -> new RuntimeException("Favorite Offer not found"));
 
         UserFavoriteOffers userFavoriteOffers = new UserFavoriteOffers(user, offersEntity);
@@ -57,7 +57,7 @@ public class JobseekerService {
     }
 
     public List<OffersEntity> getFavorites(Long userId) {
-        return listOfOffersRepository.findByUserFavoriteOffers_UserId(userId);
+        return offersEntityRepository.findByUserFavoriteOffers_UserId(userId);
     }
 
 }

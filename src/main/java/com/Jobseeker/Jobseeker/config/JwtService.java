@@ -1,4 +1,4 @@
-package com.Jobseeker.Jobseeker.Config;
+package com.Jobseeker.Jobseeker.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

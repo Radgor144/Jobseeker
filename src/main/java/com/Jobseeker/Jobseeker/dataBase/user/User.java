@@ -1,6 +1,6 @@
-package com.Jobseeker.Jobseeker.dataBase.User;
+package com.Jobseeker.Jobseeker.dataBase.user;
 
-import com.Jobseeker.Jobseeker.dataBase.Favorite.UserFavoriteOffers;
+import com.Jobseeker.Jobseeker.dataBase.favorite.UserFavoriteOffers;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -58,22 +58,18 @@ public class User implements UserDetails {
         return password;
     }
 
-    @Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
-    @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
-    @Override
     public boolean isEnabled() {
         return true;
     }

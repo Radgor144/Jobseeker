@@ -1,8 +1,8 @@
-package com.Jobseeker.Jobseeker.dataBase.Repositories;
+package com.Jobseeker.Jobseeker.dataBase.repositories;
 
-import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersEntity;
-import com.Jobseeker.Jobseeker.dataBase.Favorite.UserFavoriteOffers;
-import com.Jobseeker.Jobseeker.dataBase.User.User;
+import com.Jobseeker.Jobseeker.dataBase.favorite.OffersEntity;
+import com.Jobseeker.Jobseeker.dataBase.favorite.UserFavoriteOffers;
+import com.Jobseeker.Jobseeker.dataBase.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

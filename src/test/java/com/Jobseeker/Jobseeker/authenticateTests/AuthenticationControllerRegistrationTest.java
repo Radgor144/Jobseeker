@@ -1,10 +1,10 @@
-package com.Jobseeker.Jobseeker.AuthenticateTests;
+package com.Jobseeker.Jobseeker.authenticateTests;
 
-import com.Jobseeker.Jobseeker.Config.JwtService;
+import com.Jobseeker.Jobseeker.config.JwtService;
 import com.Jobseeker.Jobseeker.auth.AuthenticationResponse;
 import com.Jobseeker.Jobseeker.auth.RegisterRequest;
-import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
-import com.Jobseeker.Jobseeker.dataBase.User.User;
+import com.Jobseeker.Jobseeker.dataBase.repositories.UserRepository;
+import com.Jobseeker.Jobseeker.dataBase.user.User;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -44,7 +44,7 @@ public class AuthenticationControllerRegistrationTest {
         String expectedToken = "mocked-jwt-token";
         RegisterRequest registerRequest = new RegisterRequest("john", "snow", "john.snow@gmail.com", "password");
 
-        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
+        when(userRepository.existsByEmail(registerRequest.email())).thenReturn(false);
         when(jwtService.generateToken(any(User.class))).thenReturn(expectedToken);
 
         // when
@@ -60,6 +60,6 @@ public class AuthenticationControllerRegistrationTest {
                 .returnResult()
                 .getResponseBody();
 
-        assertEquals(response.getToken(), expectedToken);
+        assertEquals(response.token(), expectedToken);
     }
 }

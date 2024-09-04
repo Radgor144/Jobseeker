@@ -1,10 +1,10 @@
-package com.Jobseeker.Jobseeker.AuthenticateTests;
+package com.Jobseeker.Jobseeker.authenticateTests;
 
-import com.Jobseeker.Jobseeker.Config.JwtService;
+import com.Jobseeker.Jobseeker.config.JwtService;
 import com.Jobseeker.Jobseeker.auth.AuthenticationRequest;
 import com.Jobseeker.Jobseeker.auth.AuthenticationResponse;
-import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
-import com.Jobseeker.Jobseeker.dataBase.User.User;
+import com.Jobseeker.Jobseeker.dataBase.repositories.UserRepository;
+import com.Jobseeker.Jobseeker.dataBase.user.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +21,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
@@ -51,33 +50,32 @@ public class AuthenticationControllerAuthenticationTest {
         AuthenticationRequest authenticationRequest = new AuthenticationRequest("john.snow@gmail.com", "password");
 
         User mockUser = new User();
-        mockUser.setEmail(authenticationRequest.getEmail());
-        mockUser.setPassword(authenticationRequest.getPassword());
+        mockUser.setEmail(authenticationRequest.email());
+        mockUser.setPassword(authenticationRequest.password());
 
         Authentication mockAuthentication = new UsernamePasswordAuthenticationToken(mockUser.getEmail(), mockUser.getPassword());
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(mockAuthentication);
 
-        when(userRepository.findByEmail(authenticationRequest.getEmail()))
+        when(userRepository.findByEmail(authenticationRequest.email()))
                 .thenReturn(Optional.of(mockUser));
 
         when(jwtService.generateToken(any(User.class)))
                 .thenReturn(expectedToken);
 
         // when
-        var response = webTestClient
+        WebTestClient.ResponseSpec responseSpec = webTestClient
                 .post()
                 .uri("/api/auth/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(authenticationRequest)
-                .exchange()
-                // then
+                .exchange();
+        // then
+        responseSpec
                 .expectStatus().isEqualTo(OK)
                 .expectBody(AuthenticationResponse.class)
-                .returnResult()
-                .getResponseBody();
+                .isEqualTo(AuthenticationResponse.builder().token(expectedToken).build());
 
-        assertEquals(response.getToken(), expectedToken);
     }
 }

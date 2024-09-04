@@ -1,7 +1,7 @@
 package com.Jobseeker.Jobseeker;
 
 
-import com.Jobseeker.Jobseeker.dataBase.Favorite.OffersEntity;
+import com.Jobseeker.Jobseeker.dataBase.favorite.OffersEntity;
 import com.Jobseeker.Jobseeker.offers.OffersAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

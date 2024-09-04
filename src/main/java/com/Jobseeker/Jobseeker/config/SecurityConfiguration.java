@@ -1,4 +1,4 @@
-package com.Jobseeker.Jobseeker.Config;
+package com.Jobseeker.Jobseeker.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

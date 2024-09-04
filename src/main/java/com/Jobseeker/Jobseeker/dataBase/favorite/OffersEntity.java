@@ -1,4 +1,4 @@
-package com.Jobseeker.Jobseeker.dataBase.Favorite;
+package com.Jobseeker.Jobseeker.dataBase.favorite;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

@@ -1,6 +1,6 @@
-package com.Jobseeker.Jobseeker.database.ListOfOffers;
+package com.Jobseeker.Jobseeker.database.listOfOffers;
 
-import com.Jobseeker.Jobseeker.dataBase.Repositories.UserFavoriteOffersRepository;
+import com.Jobseeker.Jobseeker.dataBase.repositories.UserFavoriteOffersRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

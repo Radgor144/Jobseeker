@@ -1,7 +1,7 @@
-package com.Jobseeker.Jobseeker.database.User;
+package com.Jobseeker.Jobseeker.database.user;
 
-import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
-import com.Jobseeker.Jobseeker.dataBase.User.User;
+import com.Jobseeker.Jobseeker.dataBase.repositories.UserRepository;
+import com.Jobseeker.Jobseeker.dataBase.user.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

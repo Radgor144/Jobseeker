@@ -1,6 +1,6 @@
-package com.Jobseeker.Jobseeker.dataBase.Favorite;
+package com.Jobseeker.Jobseeker.dataBase.favorite;
 
-import com.Jobseeker.Jobseeker.dataBase.User.User;
+import com.Jobseeker.Jobseeker.dataBase.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

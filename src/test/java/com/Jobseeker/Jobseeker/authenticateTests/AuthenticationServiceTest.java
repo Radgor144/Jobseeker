@@ -1,11 +1,11 @@
-package com.Jobseeker.Jobseeker.AuthenticateTests;
+package com.Jobseeker.Jobseeker.authenticateTests;
 
-import com.Jobseeker.Jobseeker.Config.JwtService;
+import com.Jobseeker.Jobseeker.config.JwtService;
 import com.Jobseeker.Jobseeker.auth.AuthenticationResponse;
 import com.Jobseeker.Jobseeker.auth.AuthenticationService;
 import com.Jobseeker.Jobseeker.auth.RegisterRequest;
-import com.Jobseeker.Jobseeker.dataBase.Repositories.UserRepository;
-import com.Jobseeker.Jobseeker.dataBase.User.User;
+import com.Jobseeker.Jobseeker.dataBase.repositories.UserRepository;
+import com.Jobseeker.Jobseeker.dataBase.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,8 +49,8 @@ public class AuthenticationServiceTest {
     @Test
     public void shouldRegisterUserAndReturnJwtToken() {
         // given
-        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
-        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encodedPassword");
+        when(userRepository.existsByEmail(registerRequest.email())).thenReturn(false);
+        when(passwordEncoder.encode(registerRequest.password())).thenReturn("encodedPassword");
         when(jwtService.generateToken(any(User.class))).thenReturn(jwtToken);
 
         // when
@@ -58,17 +58,17 @@ public class AuthenticationServiceTest {
 
         // then
         assertNotNull(response);
-        assertEquals(jwtToken, response.getToken());
-        verify(userRepository, times(1)).existsByEmail(registerRequest.getEmail());
+        assertEquals(jwtToken, response.token());
+        verify(userRepository, times(1)).existsByEmail(registerRequest.email());
         verify(userRepository, times(1)).save(any(User.class));
-        verify(passwordEncoder, times(1)).encode(registerRequest.getPassword());
+        verify(passwordEncoder, times(1)).encode(registerRequest.password());
         verify(jwtService, times(1)).generateToken(any(User.class));
     }
 
     @Test
     public void shouldThrowExceptionWhenEmailAlreadyExists() {
         // given
-        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(true);
+        when(userRepository.existsByEmail(registerRequest.email())).thenReturn(true);
 
         // when & then
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
@@ -76,7 +76,7 @@ public class AuthenticationServiceTest {
         });
 
         assertEquals("The email already exists", exception.getMessage());
-        verify(userRepository, times(1)).existsByEmail(registerRequest.getEmail());
+        verify(userRepository, times(1)).existsByEmail(registerRequest.email());
         verify(userRepository, times(0)).save(any(User.class));
         verify(jwtService, times(0)).generateToken(any(User.class));
     }
