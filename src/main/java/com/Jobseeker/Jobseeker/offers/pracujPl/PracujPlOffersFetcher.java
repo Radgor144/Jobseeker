@@ -29,10 +29,10 @@ public class PracujPlOffersFetcher implements OffersFetcher {
 
     private int getTechnologyCode(String technology) {
         return switch (technology) {
-            case "javaScript" -> 33;
+            case "javascript" -> 33;
             case "python" -> 37;
             case "java" -> 38;
-            case "c#" -> 39;
+            case "c" -> 39;
             default -> throw new IllegalStateException("Unexpected value: " + technology);
         };
     }

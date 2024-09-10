@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/secure")
@@ -25,15 +24,6 @@ public class JobseekerController {
     public JobseekerController(JobseekerService jobseekerService, OffersAggregator offersAggregator) {
         this.offersAggregator = offersAggregator;
         this.jobseekerService = jobseekerService;
-    }
-
-    @PostMapping("/offers")
-    public List<Offers> searchJobOffers(@RequestParam("location") String location,
-                                        @RequestParam("technology") String technology,
-                                        @RequestParam("experience") String experience) throws ExecutionException, InterruptedException {
-        List<Offers> offers = offersAggregator.aggregateOffers(location, technology, experience);
-        jobseekerService.addToDataBase(offers);
-        return offers;
     }
 
     @PostMapping("/add")
