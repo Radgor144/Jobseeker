@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface OffersEntityRepository extends JpaRepository<OffersEntity, Long> {
     List<OffersEntity> findByUserFavoriteOffers_UserId(Long userId);
+    boolean existsByLink(String link);
 }
 

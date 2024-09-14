@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,15 +29,15 @@ public class JobseekerService {
 
 
     @Transactional
-    public void addToDataBase(List<Offers> offers) {
-        List<OffersEntity> offersEntityList = offers.stream()
+    public void addToDataBase(Set<Offers> offers) {
+        Set<OffersEntity> offersEntityList = offers.stream()
                 .map(this::mapToOffersEntity)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         offersEntityRepository.saveAll(offersEntityList);
     }
 
     private OffersEntity mapToOffersEntity(Offers offer) {
-        return new OffersEntity(null, offer.name(), offer.salary(), offer.link(), null);
+        return new OffersEntity(null, offer.name(), offer.salary(), offer.link(), true, null);
     }
 
     public void addFavorite(Long userId, Long favoriteOfferId) {
@@ -58,6 +59,9 @@ public class JobseekerService {
 
     public List<OffersEntity> getFavorites(Long userId) {
         return offersEntityRepository.findByUserFavoriteOffers_UserId(userId);
+    }
+    public List<OffersEntity> getAllOffers() {
+        return offersEntityRepository.findAll();
     }
 
 }

@@ -25,6 +25,7 @@ public class OffersEntity {
     private String name;
     private String salary;
     private String link;
+    private boolean current;
 
     @OneToMany(mappedBy = "offersEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<UserFavoriteOffers> userFavoriteOffers;

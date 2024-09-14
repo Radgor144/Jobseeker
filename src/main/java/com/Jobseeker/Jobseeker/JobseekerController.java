@@ -2,7 +2,6 @@ package com.Jobseeker.Jobseeker;
 
 
 import com.Jobseeker.Jobseeker.dataBase.favorite.OffersEntity;
-import com.Jobseeker.Jobseeker.offers.OffersAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +16,10 @@ import java.util.List;
 @RequestMapping("/api/secure")
 public class JobseekerController {
 
-    private final OffersAggregator offersAggregator;
     private final JobseekerService jobseekerService;
 
     @Autowired
-    public JobseekerController(JobseekerService jobseekerService, OffersAggregator offersAggregator) {
-        this.offersAggregator = offersAggregator;
+    public JobseekerController(JobseekerService jobseekerService) {
         this.jobseekerService = jobseekerService;
     }
 
@@ -37,8 +34,13 @@ public class JobseekerController {
         return "Offer deleted from favorites";
     }
 
-    @GetMapping("/list")
+    @GetMapping("/getFavorite")
     public ResponseEntity<List<OffersEntity>> getFavorites(@RequestParam Long userId) {
         return ResponseEntity.ok(jobseekerService.getFavorites(userId));
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<OffersEntity>> getAllOffers() {
+        return ResponseEntity.ok(jobseekerService.getAllOffers());
     }
 }
