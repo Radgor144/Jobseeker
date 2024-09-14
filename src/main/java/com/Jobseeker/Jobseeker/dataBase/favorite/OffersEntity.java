@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -26,6 +27,7 @@ public class OffersEntity {
     private String salary;
     private String link;
     private boolean current;
+    private LocalDateTime creationDate;
 
     @OneToMany(mappedBy = "offersEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<UserFavoriteOffers> userFavoriteOffers;

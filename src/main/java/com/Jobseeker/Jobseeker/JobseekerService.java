@@ -9,6 +9,7 @@ import com.Jobseeker.Jobseeker.dataBase.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,7 +38,7 @@ public class JobseekerService {
     }
 
     private OffersEntity mapToOffersEntity(Offers offer) {
-        return new OffersEntity(null, offer.name(), offer.salary(), offer.link(), true, null);
+        return new OffersEntity(null, offer.name(), offer.salary(), offer.link(), true, LocalDateTime.now(), null);
     }
 
     public void addFavorite(Long userId, Long favoriteOfferId) {
