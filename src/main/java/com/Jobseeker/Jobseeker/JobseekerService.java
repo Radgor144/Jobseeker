@@ -1,99 +1,68 @@
 package com.Jobseeker.Jobseeker;
 
-import com.Jobseeker.Jobseeker.BulldogJob.BulldogJobClient;
-import com.Jobseeker.Jobseeker.BulldogJob.BulldogJobConnector;
-import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffers;
-import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffersRepository;
-import com.Jobseeker.Jobseeker.justJoin.JustJoinClient;
-import com.Jobseeker.Jobseeker.justJoin.JustJoinConnector;
-import com.Jobseeker.Jobseeker.pracujPl.PracujPlClient;
-import com.Jobseeker.Jobseeker.pracujPl.PracujPlConnector;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
+import com.Jobseeker.Jobseeker.dataBase.favorite.OffersEntity;
+import com.Jobseeker.Jobseeker.dataBase.favorite.UserFavoriteOffers;
+import com.Jobseeker.Jobseeker.dataBase.repositories.OffersEntityRepository;
+import com.Jobseeker.Jobseeker.dataBase.repositories.UserFavoriteOffersRepository;
+import com.Jobseeker.Jobseeker.dataBase.repositories.UserRepository;
+import com.Jobseeker.Jobseeker.dataBase.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class JobseekerService {
+    private final UserFavoriteOffersRepository userFavoriteOffersRepository;
+    private final UserRepository userRepository;
+    private final OffersEntityRepository offersEntityRepository;
 
-    private final JustJoinClient justJoinClient;
-    private final JustJoinConnector justJoinConnector;
-    private final BulldogJobClient bulldogJobClient;
-    private final BulldogJobConnector bulldogJobConnector;
-    private final PracujPlClient pracujPlClient;
-    private final PracujPlConnector pracujPlConnector;
-    private final FavoriteOffersRepository favoriteOffersRepository;
-    private final TaskExecutor taskExecutor;
-
-    @Autowired
-    public JobseekerService(JustJoinClient justJoinClient, JustJoinConnector justJoinConnector,
-                            BulldogJobClient bulldogJobClient, BulldogJobConnector bulldogJobConnector,
-                            PracujPlClient pracujPlClient, PracujPlConnector pracujPlConnector,
-                            FavoriteOffersRepository favoriteOffersRepository,
-                            @Qualifier("threadPoolTaskExecutor") TaskExecutor taskExecutor) {
-        this.justJoinClient = justJoinClient;
-        this.justJoinConnector = justJoinConnector;
-        this.bulldogJobClient = bulldogJobClient;
-        this.bulldogJobConnector = bulldogJobConnector;
-        this.pracujPlClient = pracujPlClient;
-        this.pracujPlConnector = pracujPlConnector;
-        this.favoriteOffersRepository = favoriteOffersRepository;
-        this.taskExecutor = taskExecutor;
+    public JobseekerService(UserFavoriteOffersRepository userFavoriteOffersRepository,
+                            UserRepository userRepository,
+                            OffersEntityRepository offersEntityRepository) {
+        this.userFavoriteOffersRepository = userFavoriteOffersRepository;
+        this.userRepository = userRepository;
+        this.offersEntityRepository = offersEntityRepository;
     }
-    @Async("threadPoolTaskExecutor")
-    public CompletableFuture<List<Offers>> getOffers(String location, String technology, String experience) throws IOException, ExecutionException, InterruptedException {
-        List<Offers> offersList = new ArrayList<>();
 
-        CompletableFuture<Void> justJoinOffers = getJustJoinOffers(location, technology, experience, offersList);
-        CompletableFuture<Void> bulldogJobOffers = getBulldogJobOffers(location, technology, experience, offersList);
-        CompletableFuture<Void> pracujPlOffers = getPracujPlOffers(location, technology, experience, offersList);
-
-        return CompletableFuture.allOf(justJoinOffers, bulldogJobOffers, pracujPlOffers)
-                .thenApplyAsync((Void) -> offersList);
-    }
 
     @Transactional
-    public void addToFavoriteList(Offers offer) {
-        if (!favoriteOffersRepository.existsByNameAndSalaryAndLink(offer.name(), offer.salary(), offer.link())) {
-            FavoriteOffers favoriteOffer = new FavoriteOffers(offer.name(), offer.salary(), offer.link());
-            favoriteOffersRepository.save(favoriteOffer);
-        }
+    public void addToDataBase(Set<Offers> offers) {
+        Set<OffersEntity> offersEntityList = offers.stream()
+                .map(this::mapToOffersEntity)
+                .collect(Collectors.toSet());
+        offersEntityRepository.saveAll(offersEntityList);
     }
 
-    public Page<FavoriteOffers> getTenFavoriteOffers() {
-        Pageable pageable = PageRequest.of(0, 10);
-        return favoriteOffersRepository.findAll(pageable);
+    private OffersEntity mapToOffersEntity(Offers offer) {
+        return new OffersEntity(null, offer.name(), offer.salary(), offer.link(), true, LocalDateTime.now(), null);
     }
 
-    private CompletableFuture<Void> getJustJoinOffers(String location, String technology, String experience, List<Offers> offersList) {
-        return CompletableFuture.runAsync(() -> {
-            String response = justJoinClient.getOffers(location, technology, experience);
-            offersList.addAll(justJoinConnector.justJoinParser(response));
-        }, taskExecutor);
+    public void addFavorite(Long userId, Long favoriteOfferId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        OffersEntity offersEntity = offersEntityRepository.findById(favoriteOfferId)
+                .orElseThrow(() -> new RuntimeException("Favorite Offer not found"));
+
+        UserFavoriteOffers userFavoriteOffers = new UserFavoriteOffers(user, offersEntity);
+        userFavoriteOffersRepository.save(userFavoriteOffers);
+    }
+    public void deleteFavorite(Long userId, Long favoriteOfferId) {
+        UserFavoriteOffers userFavoriteOffer = userFavoriteOffersRepository.findByUserIdAndOffersEntityId(userId, favoriteOfferId)
+                .orElseThrow(() -> new RuntimeException("Favorite Offer not found in user's favorites"));
+
+        userFavoriteOffersRepository.delete(userFavoriteOffer);
     }
 
-    private CompletableFuture<Void> getBulldogJobOffers(String location, String technology, String experience, List<Offers> offersList) {
-        return CompletableFuture.runAsync(() -> {
-            String bulldogExperience = "mid".equals(experience) ? "medium" : experience;
-            String response = bulldogJobClient.getOffers(location, technology, bulldogExperience);
-            offersList.addAll(bulldogJobConnector.bulldogJobParser(response));
-        }, taskExecutor);
+    public List<OffersEntity> getFavorites(Long userId) {
+        return offersEntityRepository.findByUserFavoriteOffers_UserId(userId);
     }
-    private CompletableFuture<Void> getPracujPlOffers(String location, String technology, String experience, List<Offers> offersList) {
-        return CompletableFuture.runAsync(() -> {
-            String response = pracujPlClient.getOffers(location, 17, 38);  // testowe dane na juniora
-            offersList.addAll(pracujPlConnector.pracujPlParser(response));
-        }, taskExecutor);
+    public List<OffersEntity> getAllOffers() {
+        return offersEntityRepository.findAll();
     }
+
 }

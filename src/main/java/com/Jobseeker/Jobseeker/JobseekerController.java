@@ -1,79 +1,46 @@
 package com.Jobseeker.Jobseeker;
 
 
-import com.Jobseeker.Jobseeker.favoriteOffers.FavoriteOffers;
+import com.Jobseeker.Jobseeker.dataBase.favorite.OffersEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
-@Controller
+@RestController
+@RequestMapping("/api/secure")
 public class JobseekerController {
 
     private final JobseekerService jobseekerService;
-    List<Offers> offersList = new ArrayList<>();
+
     @Autowired
     public JobseekerController(JobseekerService jobseekerService) {
         this.jobseekerService = jobseekerService;
     }
 
-    @GetMapping("/home")
-    public String home() {
-        return "home";
+    @PostMapping("/add")
+    public ResponseEntity<?> addFavorite(@RequestParam Long userId, @RequestParam Long favoriteOfferId) {
+        jobseekerService.addFavorite(userId, favoriteOfferId);
+        return ResponseEntity.ok("Offer added to favorites");
+    }
+    @PostMapping("/delete")
+    public String deleteFavorite(@RequestParam Long userId, @RequestParam Long favoriteOfferId) {
+        jobseekerService.deleteFavorite(userId, favoriteOfferId);
+        return "Offer deleted from favorites";
     }
 
-    @PostMapping("/offers")
-    public String searchJobOffers(@RequestParam("location") String location,
-                            @RequestParam("technology") String technology,
-                            @RequestParam("experience") String experience,
-                            Model model) {
-        try {
-            offersList.clear();
-            CompletableFuture<List<Offers>> offersFuture = jobseekerService.getOffers(location, technology, experience);
-            List<Offers> offers = offersFuture.get();
-
-            for(Offers o : offers) {
-                Offers offer = new Offers(o.name(), o.salary(), o.link());
-                offersList.add(offer);
-            }
-
-            model.addAttribute("offers", offersList);
-            return "offers";
-
-
-        } catch (IOException | ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-            return "error";
-        }
+    @GetMapping("/getFavorite")
+    public ResponseEntity<List<OffersEntity>> getFavorites(@RequestParam Long userId) {
+        return ResponseEntity.ok(jobseekerService.getFavorites(userId));
     }
 
-    @GetMapping("/offers")
-    public String refreshOffers(Model model) {
-        model.addAttribute("offers", offersList);
-        return "offers";
-    }
-
-    @PostMapping("/favorites")
-    public String addOfferToFavorite(@ModelAttribute Offers offer) {
-        jobseekerService.addToFavoriteList(offer);
-
-        return "redirect:/offers";
-    }
-
-    @GetMapping("/favorites")
-    public String getFavoriteOffers(Model model) {
-        Page<FavoriteOffers> favoriteOffersPage = jobseekerService.getTenFavoriteOffers();
-        model.addAttribute("favorites", favoriteOffersPage);
-        return "favorites";
+    @GetMapping("/list")
+    public ResponseEntity<List<OffersEntity>> getAllOffers() {
+        return ResponseEntity.ok(jobseekerService.getAllOffers());
     }
 }
